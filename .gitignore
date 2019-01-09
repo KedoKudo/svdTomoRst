@@ -256,3 +256,6 @@ TSWLatexianTemp*
 
 # tmp files
 tmp/*
+
+# mac os 
+.DS_Store
