@@ -6,7 +6,6 @@ scikit-image
 mkl
 mkl_fft
 mkl-include
-dxchange
 numexpr
 tomopy
 dxchange
