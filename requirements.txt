@@ -1,0 +1,13 @@
+numpy
+h5py
+scipy
+six
+scikit-image
+mkl
+mkl_fft
+mkl-include
+dxchange
+numexpr
+tomopy
+dxchange
+futures ; python_version < "3"
