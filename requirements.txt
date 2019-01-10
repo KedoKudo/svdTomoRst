@@ -7,6 +7,4 @@ mkl
 mkl_fft
 mkl-include
 numexpr
-tomopy
-dxchange
 futures ; python_version < "3"
