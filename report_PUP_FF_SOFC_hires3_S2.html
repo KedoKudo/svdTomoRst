@@ -11818,8 +11818,27 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Singular value decomposition is a powerful tool that is commonly used in the noise reduction for realtime image stream, lossy images compression and feature detection. 
 In this section, the application of SVD based image enhancement for tomography reconsutrction is investigated.</p>
-<blockquote><p>NOTE:
-Due to large amount of GIFs used in this notebook, it might take a few minutes (depending on the network) for Binder to load all of them the browser.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote><p>Simple example demonstrating eigen feature (eigenimg)</p>
+</blockquote>
+<p><img src="imgs/eignimg_2628.gif" alt="eigDemo" title="eig_400"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote><p>NOTE:<br>
+Due to large amount of GIFs used in this notebook, it might <strong>take a few minutes</strong> (depending on the network) for Binder to load all of them the browser.</p>
 </blockquote>
 
 </div>
@@ -12206,13 +12225,96 @@ An <strong>interactive</strong> example is provided in the cell below.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Compensate-for-horizontal-sample-jittering/drifting">Compensate for horizontal sample jittering/drifting<a class="anchor-link" href="#Compensate-for-horizontal-sample-jittering/drifting">&#182;</a></h2><p>As mentioned in previous section, significant amount of sample jittering (locally) and drifting were found along the horizontal axis. 
-In other words, the rotation center for each image are not necessearily correlated anymore.
-Therefore, it is necesary to properly align samples from different images ($\omega$) such that a universal rotation center can be defined for the reconstruction process. 
-To this end, two different method are proposed here, the reconstruction results of which is compared with</p>
+<blockquote><p>NOTE:
+several features about CLAHE need to be pointed out here:</p>
+</blockquote>
+<ul>
+<li>CLAHE does not add <em>new</em> features, it only amplify features based on local histogram</li>
+<li>CLAHE does not remove artifacts.<ul>
+<li>It might actually amplify the artifacts</li>
+</ul>
+</li>
+<li>CLAHE can be computational expensive<ul>
+<li>The CLAHE performed here is using the CLAHE function provided by ImageJ</li>
+</ul>
+</li>
+</ul>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Compensate-for-horizontal-sample-jittering/drifting">Compensate for horizontal sample jittering/drifting<a class="anchor-link" href="#Compensate-for-horizontal-sample-jittering/drifting">&#182;</a></h2><p>As mentioned in previous section, significant amount of sample jittering (locally) and drifting (globally) were found along the horizontal axis. 
+In other words, the rotation center for each image are not necessearily correlated anymore.
+Therefore, it is necesary to properly align samples from different images ($\omega$) such that a universal rotation center can be defined for the reconstruction process. 
+To this end, two different method are proposed here:</p>
+<ul>
+<li>iterative global adjustment (IGA)<ul>
+<li>calcuate the rotation center ($y_{rc}^\omega$) of each pair image ($\Delta\omega = 180^\text{o}$)</li>
+<li>find the average rotatio center $\bar{y}_{rc}$ </li>
+<li>move the rotation center of each pair to the center column</li>
+<li>calculate new average rotatio center $y_{rc}'$</li>
+<li>repeat until $y_{rc}$ converges</li>
+</ul>
+</li>
+<li>iterative pairwise adjustment (IPA)
+  * </li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Profiling-the-horizontal-jittering">Profiling the horizontal jittering<a class="anchor-link" href="#Profiling-the-horizontal-jittering">&#182;</a></h3><p>Using phase correlation on image pairs that are $180^\text{o}$ away along $\omega$-axis, the</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s1">&#39;imgs/rotcnt_stats.pdf&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">850</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[27]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+        <iframe
+            width="850"
+            height="500"
+            src="imgs/rotcnt_stats.pdf"
+            frameborder="0"
+            allowfullscreen
+        ></iframe>
+        
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
     </div>
   </div>
