@@ -11778,6 +11778,7 @@ div#notebook {
 <h1 id="Tomography-reconstruction-of-PUP_FF_SOFC_hires3_S2">Tomography reconstruction of PUP_FF_SOFC_hires3_S2<a class="anchor-link" href="#Tomography-reconstruction-of-PUP_FF_SOFC_hires3_S2">&#182;</a></h1><p>The tomography data set PUP_FF_SOFC_hires3_S2 is used in this study.  <strong>Four</strong> topics are discussed in this notebook:</p>
 <ul>
 <li>Using SVD based method to remove noises in the projection images (after background normalization)</li>
+<li>Using image processing method adaptive histogram equalization (<a href="https://en.wikipedia.org/wiki/Adaptive_histogram_equalization">CLAHE</a>) to enhance the details in reconstruction results</li>
 <li>Iterative method to compensate the horizontal sample jittering (locally) and drifting (globally)<ul>
 <li>standard phase correlation based rotation center locator</li>
 <li>iterative global adjustment (IGA)</li>
@@ -11785,7 +11786,6 @@ div#notebook {
 </ul>
 </li>
 <li>Various atttempt to compensate for the vertical sample jittering (locally) and drifting (globally)</li>
-<li>Using image processing method adaptive histogram equalization (<a href="https://en.wikipedia.org/wiki/Adaptive_histogram_equalization">CLAHE</a>) to enhance the details in reconstruction results</li>
 </ul>
 
 </div>
@@ -11829,7 +11829,7 @@ Due to large amount of GIFs used in this notebook, it might take a few minutes (
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="SVD-enhanced-projections-with-various-n_eig">SVD enhanced projections with various n_eig<a class="anchor-link" href="#SVD-enhanced-projections-with-various-n_eig">&#182;</a></h2><p>Left= original image , middle= eigen space, right= reconstructed from reduced eigen space (SVD method)</p>
+<h3 id="SVD-enhanced-projections-with-various-n_eig">SVD enhanced projections with various n_eig<a class="anchor-link" href="#SVD-enhanced-projections-with-various-n_eig">&#182;</a></h3><p>Left= original image , middle= eigen space, right= reconstructed from reduced eigen space (SVD method)</p>
 
 </div>
 </div>
@@ -11942,7 +11942,8 @@ Due to large amount of GIFs used in this notebook, it might take a few minutes (
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="SVD-enhanced-projections-centerred-via-iterative-phase-correlation-adjustment">SVD enhanced projections centerred via iterative phase correlation adjustment<a class="anchor-link" href="#SVD-enhanced-projections-centerred-via-iterative-phase-correlation-adjustment">&#182;</a></h2><p>It takes roughly about 1-2 iterations to ensure that the global rotation center is close to the image center (within 0.1 pixels).  However, there still seems to be some wiggling of the sample, which also could be the result of the varying background</p>
+<p>The results above indicate that the first a few eigen features (~20) are sufficient in capturing most of the information about the sample whereas the remaining eigen features are most likely related to the various noise in the final images.
+Therefore, it is possible to use the first 20 eigen features to extract the main features (sample) of the projection images, effectively separating the sample from the various shawdowy background noises.</p>
 
 </div>
 </div>
@@ -11951,75 +11952,11 @@ Due to large amount of GIFs used in this notebook, it might take a few minutes (
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Standard View</p>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 400</code></th>
-<th style="text-align:center"><code>n_eig = 300</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax400.png" alt="dist_rot_eigMax400" title="dist_rot_eigMax400"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax300.png" alt="dist_rot_eigMax300" title="dist_rot_eigMax300"></td>
-</tr>
-<tr>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax400.gif" alt="eigMax400" title="eig_400"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax300.gif" alt="eigMax300" title="eig_300"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 160</code></th>
-<th style="text-align:center"><code>n_eig = 80</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax160.png" alt="dist_rot_eigMax160" title="dist_rot_eigMax160"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax80.png" alt="dist_rot_eigMax080" title="dist_rot_eigMax080"></td>
-</tr>
-<tr>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax160.gif" alt="eigMax160" title="eig_160"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax080.gif" alt="eigMax080" title="eig_80"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 40</code></th>
-<th style="text-align:center"><code>n_eig = 20</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax40.png" alt="dist_rot_eigMax40" title="dist_rot_eigMax40"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax20.png" alt="dist_rot_eigMax20" title="dist_rot_eigMax20"></td>
-</tr>
-<tr>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax040.gif" alt="eigMax040" title="eig_40"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax020.gif" alt="eigMax20" title="eig_20"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 10</code></th>
-<th style="text-align:center"><code>n_eig = 5</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax10.png" alt="dist_rot_eigMax10" title="dist_rot_eigMax10"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax5.png" alt="dist_rot_eigMax5" title="dist_rot_eigMax5"></td>
-</tr>
-<tr>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax010.gif" alt="eigMax010" title="eig_10"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax005.gif" alt="eigMax005" title="eig_5"></td>
-</tr>
-</tbody>
-</table>
+<h3 id="Tomography-reconstruction-using-SVD-enhanced-images">Tomography reconstruction using SVD enhanced images<a class="anchor-link" href="#Tomography-reconstruction-using-SVD-enhanced-images">&#182;</a></h3><p>Following the standard procedure, the rotation center of this data set can be found through phase correlation of the 180 degree pairs. 
+However, the significant horizontal jittering and drifing of the sample makes it difficult of acquire clear reconstruction results.
+Therefore, iterative global adjustment (IGA), a horizontal drift adjustment method, is used to <strong>horizontally centering the sample</strong> from all <strong>3601</strong> ($-180^\text{o} \to 180^\text{o}$, $\delta\omega=0.1^\text{o}$) images.</p>
+<blockquote><p>The detailed analysis of IGA will be covered in the next section</p>
+</blockquote>
 
 </div>
 </div>
@@ -12028,188 +11965,7 @@ Due to large amount of GIFs used in this notebook, it might take a few minutes (
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Compact View</p>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 400</code></th>
-<th style="text-align:center"><code>n_eig = 300</code></th>
-<th style="text-align:center"><code>n_eig = 160</code></th>
-<th style="text-align:center"><code>n_eig = 80</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax400.png" alt="dist_rot_eigMax400" title="dist_rot_eigMax400"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax300.png" alt="dist_rot_eigMax300" title="dist_rot_eigMax300"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax160.png" alt="dist_rot_eigMax160" title="dist_rot_eigMax160"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax80.png" alt="dist_rot_eigMax080" title="dist_rot_eigMax080"></td>
-</tr>
-<tr>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax400.gif" alt="eigMax400" title="eig_400"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax300.gif" alt="eigMax300" title="eig_300"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax160.gif" alt="eigMax160" title="eig_160"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax080.gif" alt="eigMax080" title="eig_80"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 40</code></th>
-<th style="text-align:center"><code>n_eig = 20</code></th>
-<th style="text-align:center"><code>n_eig = 10</code></th>
-<th style="text-align:center"><code>n_eig = 5</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax40.png" alt="dist_rot_eigMax40" title="dist_rot_eigMax40"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax20.png" alt="dist_rot_eigMax20" title="dist_rot_eigMax20"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax10.png" alt="dist_rot_eigMax10" title="dist_rot_eigMax10"></td>
-<td style="text-align:center"><img src="imgs/dis_rotcnt_eigMax5.png" alt="dist_rot_eigMax5" title="dist_rot_eigMax5"></td>
-</tr>
-<tr>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax040.gif" alt="eigMax040" title="eig_40"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax020.gif" alt="eigMax20" title="eig_20"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax010.gif" alt="eigMax010" title="eig_10"></td>
-<td style="text-align:center"><img src="imgs/img_centered_eigMax005.gif" alt="eigMax005" title="eig_5"></td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Additional-adjustment-on-the-projection-images">Additional adjustment on the projection images<a class="anchor-link" href="#Additional-adjustment-on-the-projection-images">&#182;</a></h2><p>The SVD enhancement method introdced some negative values in the projection images (even with n_eig=400, aka all eigen vectors), which is expected since SVD is often used as a losy image compression method.
-However, this does raise question whether the negative values introduced by the SVD enhancement leads to the negative values observed in the final reconstruction images.
-In this section, projection images from each case (various n_eig) are compared with the the corresponding ones with the negative value clipped using</p>
-<div class="highlight"><pre><span></span><span class="n">image</span><span class="p">[</span><span class="n">image</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Standard View</p>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 400</code></th>
-<th style="text-align:center"><code>n_eig = 300</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax400.gif" alt="eigMax400" title="eig_400"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax300.gif" alt="eigMax300" title="eig_300"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 160</code></th>
-<th style="text-align:center"><code>n_eig = 80</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax160.gif" alt="eigMax160" title="eig_160"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax080.gif" alt="eigMax080" title="eig_80"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 40</code></th>
-<th style="text-align:center"><code>n_eig = 20</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax040.gif" alt="eigMax040" title="eig_40"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax020.gif" alt="eigMax20" title="eig_20"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 10</code></th>
-<th style="text-align:center"><code>n_eig = 5</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax010.gif" alt="eigMax010" title="eig_10"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax005.gif" alt="eigMax005" title="eig_5"></td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Compact View</p>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 400</code></th>
-<th style="text-align:center"><code>n_eig = 300</code></th>
-<th style="text-align:center"><code>n_eig = 160</code></th>
-<th style="text-align:center"><code>n_eig = 80</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax400.gif" alt="eigMax400" title="eig_400"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax300.gif" alt="eigMax300" title="eig_300"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax160.gif" alt="eigMax160" title="eig_160"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax080.gif" alt="eigMax080" title="eig_80"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 40</code></th>
-<th style="text-align:center"><code>n_eig = 20</code></th>
-<th style="text-align:center"><code>n_eig = 10</code></th>
-<th style="text-align:center"><code>n_eig = 5</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax040.gif" alt="eigMax040" title="eig_40"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax020.gif" alt="eigMax20" title="eig_20"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax010.gif" alt="eigMax010" title="eig_10"></td>
-<td style="text-align:center"><img src="imgs/img_clipped_centered_eigMax005.gif" alt="eigMax005" title="eig_5"></td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Clipping off the negative values really helps improve the local contrast of the proejction images, making the features in the sample more prominent to the viewer.  However these benefits diminishes with increasing n_eig, which is most due to the fact that lower n_eig has an intrinsic feature of reducing the negative values (see the CDF of each corresponding image).</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Comparison-of-tomography-reconstruction-results">Comparison of tomography reconstruction results<a class="anchor-link" href="#Comparison-of-tomography-reconstruction-results">&#182;</a></h2><p>With the enhanced and centered projection images, the tomograhy reconstruction can be eaisly done using existing toolkit (tomopy) with the command below</p>
+<p>With the enhanced and centered projection images, the tomograhy reconstruction can be eaisly done using existing toolkit (tomopy) with the command below</p>
 <div class="highlight"><pre><span></span><span class="n">recon</span> <span class="o">=</span> <span class="n">tomopy</span><span class="o">.</span><span class="n">recon</span><span class="p">(</span><span class="n">projs</span><span class="p">,</span> <span class="n">thetas</span><span class="p">,</span> 
                      <span class="n">center</span><span class="o">=</span><span class="n">rot_center</span><span class="p">,</span> 
                      <span class="n">algorithm</span><span class="o">=</span><span class="n">recon_config</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">],</span>
@@ -12229,16 +11985,8 @@ In this section, projection images from each case (various n_eig) are compared w
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Since the physical meaning of the negative pixels introduced by the SVD enhanement is still unclear, it would be dangerous to simply assume these negative pixels are safe to remove.  Therefore, parallel tomography reconstructions were perform for each case (varying n_eig), one using the enhanced and centered projection images while the other using the enhance and centered proejection images with negative pixels removed.</p>
+<p><strong>Tomo results using <em>enhanced</em> and <em>centered</em> projection images</strong></p>
 
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Tomo-results-using-enhanced-and-centered-projection-images">Tomo results using <em>enhanced</em> and <em>centered</em> projection images<a class="anchor-link" href="#Tomo-results-using-enhanced-and-centered-projection-images">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12350,15 +12098,19 @@ In this section, projection images from each case (various n_eig) are compared w
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>There are serveral interesting results here:</p>
+<p>The results above indicate that:</p>
 <ul>
 <li>The <strong>more eigen features (vectors)</strong> used in the SVD enhancement, <strong>the sharper</strong> the images. However, this effect is not linearly (<strong>non-linearity</strong>) depending no n_eig as the increase in sharpness plateaued quickly when n_eig passed 20.</li>
 <li>The artifact of rings, which is a known issues in Tomopy (see the ripple features in each GIF image), are more prominent with larger n_eig.  In the extreme cases where the reconstruction is only done with the first 5 eigen features (vectors), the ring artifacts disappeared completely.<ul>
-<li>it is also worht pointing out that the reconstruction quality at n_eig=5 is really low as the whole images are somewhat blurred.</li>
+<li>it is also worth pointing out that the reconstruction quality at n_eig=5 is really low as the whole images are somewhat blurred.</li>
 <li>the preojction images reconstructed from the first 5 eigen vectors looks very different from the original images (see previous sections), but the reconstruction results are roughly the same as the other.</li>
 </ul>
 </li>
-<li>A significant portion (~10%) of the pixels in the reconstruction images have negative values.</li>
+<li>A significant portion (~10%) of the pixels in the reconstruction images have negative values.<ul>
+<li>these negative pixels are natural output of the tomograhy reconstruction, therefore they should not be clipped off by force</li>
+<li>it is possible to shift and rescale the dynamic range of each image, however, this process often leads to large brightness variation along $\omega$.</li>
+</ul>
+</li>
 <li>The CDF distribution remains very steady, regardless of the number of eigen features used for reconstruction.</li>
 </ul>
 
@@ -12369,67 +12121,32 @@ In this section, projection images from each case (various n_eig) are compared w
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Tomo-results-using-enhanced,-centered,-and-clipped-projection-images">Tomo results using <em>enhanced</em>, <em>centered</em>, and <em>clipped</em> projection images<a class="anchor-link" href="#Tomo-results-using-enhanced,-centered,-and-clipped-projection-images">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Standar View</p>
+<p>Overall, the SVD based denoising method proves to be efficient in removing the unwanted background noises in the normalized images.  However, there are also several undesirable outcomes that comes with this method. 
+The pros and cons of the proposed SVD based projection enhancement for tomography reconstruction is summarized in the table below.</p>
 <table>
 <thead><tr>
-<th style="text-align:center"><code>n_eig = 400</code></th>
-<th style="text-align:center"><code>n_eig = 300</code></th>
+<th style="text-align:center">pros</th>
+<th style="text-align:center">cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax400.gif" alt="eigMax400" title="eig_400"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax300.gif" alt="eigMax300" title="eig_300"></td>
+<td style="text-align:center">efficient in removing unwanted noises in the normilzed images</td>
+<td style="text-align:center">fine details (pixel level) might lost in the process</td>
 </tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 160</code></th>
-<th style="text-align:center"><code>n_eig = 80</code></th>
-</tr>
-</thead>
-<tbody>
 <tr>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax160.gif" alt="eigMax160" title="eig_160"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax080.gif" alt="eigMax080" title="eig_80"></td>
+<td style="text-align:center">easy to implement</td>
+<td style="text-align:center">the computation cost (mostly memory) increase rapidly with increasing image sizes</td>
 </tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 40</code></th>
-<th style="text-align:center"><code>n_eig = 20</code></th>
-</tr>
-</thead>
-<tbody>
 <tr>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax040.gif" alt="eigMax040" title="eig_40"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax020.gif" alt="eigMax20" title="eig_20"></td>
+<td style="text-align:center">capable of capturing most features in the final reconstruction with merely 20 eigen features</td>
+<td style="text-align:center">the reconstruction results might look slighly blurred</td>
 </tr>
 </tbody>
 </table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 10</code></th>
-<th style="text-align:center"><code>n_eig = 5</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax010.gif" alt="eigMax010" title="eig_10"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax005.gif" alt="eigMax005" title="eig_5"></td>
-</tr>
-</tbody>
-</table>
+<blockquote><p>NOTE:
+The SVD based enhancement also has very little effect for the sample jittering/drifting adjustment, the details of which are covered in the next section.</p>
+</blockquote>
 
 </div>
 </div>
@@ -12438,69 +12155,16 @@ In this section, projection images from each case (various n_eig) are compared w
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Compact View</p>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 400</code></th>
-<th style="text-align:center"><code>n_eig = 300</code></th>
-<th style="text-align:center"><code>n_eig = 160</code></th>
-<th style="text-align:center"><code>n_eig = 80</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax400.gif" alt="eigMax400" title="eig_400"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax300.gif" alt="eigMax300" title="eig_300"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax160.gif" alt="eigMax160" title="eig_160"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax080.gif" alt="eigMax080" title="eig_80"></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead><tr>
-<th style="text-align:center"><code>n_eig = 40</code></th>
-<th style="text-align:center"><code>n_eig = 20</code></th>
-<th style="text-align:center"><code>n_eig = 10</code></th>
-<th style="text-align:center"><code>n_eig = 5</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax040.gif" alt="eigMax040" title="eig_40"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax020.gif" alt="eigMax20" title="eig_20"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax010.gif" alt="eigMax010" title="eig_10"></td>
-<td style="text-align:center"><img src="imgs/recon_sinNeg_clipped_centered_eigMax005.gif" alt="eigMax005" title="eig_5"></td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Here are some interesting points that can be derived from the results shown here:</p>
-<ul>
-<li>The negative pixels in the projection images used for this section are removed, yet there are still a sizable amout of pixels (~10%) in the reconstruction results containing negative values/intensities.<ul>
-<li>This result indicates that the negative pixels in the proejction images are not the cause of the negative pixels observed in the reconstruction results. </li>
-<li>In other words, the negative pixeles are the natural product of the tomography reconstruction.</li>
-</ul>
-</li>
-<li>The CDF of all cases (varying n_eig) shows that the number of negative pixels are not affected by the number of eigen features selected for reconstruction.<ul>
-<li>The negative pixels are not artifacts from the SVD enhancement, therefore it is not safe to clipped them off</li>
-</ul>
-</li>
-<li>The clipping of negative pixels in the projection images has little effect on the final reconstruction results.</li>
-</ul>
+<h2 id="Enhance-reconstruction-results-with-adaptive-histogram-equilization">Enhance reconstruction results with adaptive histogram equilization<a class="anchor-link" href="#Enhance-reconstruction-results-with-adaptive-histogram-equilization">&#182;</a></h2><p>The tomography reconstruction results from high energy xray diffraction often has low contrast, making it difficult to spot the important features through visual inspection.
+To overcome this issue, adaptive histogram equilization (<a href="https://en.wikipedia.org/wiki/Adaptive_histogram_equalization">CLAHE</a>) is used to bring out the details in the reconstruction results.
+An <strong>interactive</strong> example is provided in the cell below.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s1">&#39;docs/demoCLAHE.html&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
@@ -12516,7 +12180,7 @@ In this section, projection images from each case (various n_eig) are compared w
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[16]:</div>
+<div class="prompt output_prompt">Out[17]:</div>
 
 
 
@@ -12537,6 +12201,18 @@ In this section, projection images from each case (various n_eig) are compared w
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Compensate-for-horizontal-sample-jittering/drifting">Compensate for horizontal sample jittering/drifting<a class="anchor-link" href="#Compensate-for-horizontal-sample-jittering/drifting">&#182;</a></h2><p>As mentioned in previous section, significant amount of sample jittering (locally) and drifting were found along the horizontal axis. 
+In other words, the rotation center for each image are not necessearily correlated anymore.
+Therefore, it is necesary to properly align samples from different images ($\omega$) such that a universal rotation center can be defined for the reconstruction process. 
+To this end, two different method are proposed here, the reconstruction results of which is compared with</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>
