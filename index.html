@@ -12354,7 +12354,7 @@ Additionaly, the IGA horizontal alignment also seems to help reduce the noisy ar
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original v.s. IGA (top view, XZ in aps)&quot;</span><span class="p">)</span>
@@ -12382,7 +12382,7 @@ Additionaly, the IGA horizontal alignment also seems to help reduce the noisy ar
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[18]:</div>
+<div class="prompt output_prompt">Out[26]:</div>
 
 
 
@@ -12663,6 +12663,84 @@ Additionaly, the IGA horizontal alignment also seems to help reduce the noisy ar
             width="550"
             height="500"
             src="docs/demoIPA_XZ.html"
+            frameborder="0"
+            allowfullscreen
+        ></iframe>
+        
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Compensate-for-vertical-sample-jittering/drifting">Compensate for vertical sample jittering/drifting<a class="anchor-link" href="#Compensate-for-vertical-sample-jittering/drifting">&#182;</a></h2><p>One possible cause of the persistent distortion in the reconstructed images (post horizontal alignment) could be the sample jittering along the image vertical direction.  However, there is no straightforward way to compensate for the vertical sample jittering (locally) and drifting (globally) due to lack of a common reference feature among different images.</p>
+<blockquote><p>For the horizontal alignment, the rotation center, which should be the same for all images, serves as an intrinsic reference feature.  Therefore, it is possible to improve the horizontal alignment by moving the rotation center of each $180^\text{o}$ pair to a common location.</p>
+</blockquote>
+<p>Therefore, the method proposed in this section assumes that the vertial offset between neighboring images (along $\omega$) are small but detectable.</p>
+<ul>
+<li>Nearest neighbor phase correlation method:<br>
+Walking along $\omega$ direction, each image is vertically alinged with its previous neighbor using phase correlation.</li>
+<li>Cumulative neighbor phase correaltion method:<br>
+Similar to the previous method, the discrete vertical shift is calcualte by performing phase correaltion on each image with its immediate previous neighbor. 
+After collecting all discrete vertical shift, the cumulative vertical shift is calculated with rolling sum $$ \Delta_v^{i} = \sum_{\omega=1}^{i} \delta_v^{\omega},  $$ which is then applied to each image to compensate for the vertical drifting.</li>
+<li>Pairwise method:<br>
+Similar to the horizontal alignment process, the vertical offset bewteen the $180^\text{o}$ pair is calcuated using phase correlation.
+Then both image are shifted towards the common vertical center such that each pair is vertically aligned. 
+In theory, this method can only reduce the variance of the vertical misalignment by half in best condition.</li>
+</ul>
+<blockquote><ul>
+<li>Due to the small magnitude of vertical shift bewteen neighboring images, an up-sampling is used to achieve 0.01 pixel resolution.  However, it is difficult to tell whether this up-sampping (100x) would be physically meaningful as no existing published work are dedicated for this topic.  </li>
+<li>The vertial shift correction are only performed for the shift that is larger than the prescribed tolerance (0.01 pixel).  This is true for all three methods proposed in this section.  </li>
+<li>Corrupted images detected from the horizontal alignment step (see previous section) are excluded from the vertical alignment process to avoid introducing new error.</li>
+</ul>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Sample-vertical-jittering-prfile">Sample vertical jittering prfile<a class="anchor-link" href="#Sample-vertical-jittering-prfile">&#182;</a></h3><p>The figure demonstrate the sample vertical jittering with respect to $\omega$ (left) as well as the assocaited cumulative distribution function (CDF, right).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s1">&#39;imgs/verticalJitterProfile_0asRef.pdf&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">850</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[25]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+        <iframe
+            width="850"
+            height="500"
+            src="imgs/verticalJitterProfile_0asRef.pdf"
             frameborder="0"
             allowfullscreen
         ></iframe>
