@@ -11793,7 +11793,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">IFrame</span>
@@ -12183,7 +12183,7 @@ An <strong>interactive</strong> example is provided in the cell below.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s1">&#39;docs/demoCLAHE.html&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
@@ -12199,7 +12199,7 @@ An <strong>interactive</strong> example is provided in the cell below.</p>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[17]:</div>
+<div class="prompt output_prompt">Out[3]:</div>
 
 
 
@@ -12225,9 +12225,8 @@ An <strong>interactive</strong> example is provided in the cell below.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<blockquote><p>NOTE:
+<p><strong>NOTE</strong><br>
 several features about CLAHE need to be pointed out here:</p>
-</blockquote>
 <ul>
 <li>CLAHE does not add <em>new</em> features, it only amplify features based on local histogram</li>
 <li>CLAHE does not remove artifacts.<ul>
@@ -12255,13 +12254,18 @@ To this end, two different method are proposed here:</p>
 <li>iterative global adjustment (IGA)<ul>
 <li>calcuate the rotation center ($y_{rc}^\omega$) of each pair image ($\Delta\omega = 180^\text{o}$)</li>
 <li>find the average rotatio center $\bar{y}_{rc}$ </li>
-<li>move the rotation center of each pair to the center column</li>
+<li>move the rotation center of each pair to the center column using $\bar{y}_{rc}$</li>
 <li>calculate new average rotatio center $y_{rc}'$</li>
 <li>repeat until $y_{rc}$ converges</li>
 </ul>
 </li>
-<li>iterative pairwise adjustment (IPA)
-  * </li>
+<li>iterative pairwise adjustment (IPA)<ul>
+<li>calcuate the rotation center ($y_{rc}^\omega$) of each pair image ($\Delta\omega = 180^\text{o}$)</li>
+<li>move rotation center of each image to the center column using $y_{rc}^\omega$</li>
+<li>calculate average rotatio center $y_{rc}'$</li>
+<li>repeat until $y_{rc}$ converges</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -12271,7 +12275,7 @@ To this end, two different method are proposed here:</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Profiling-the-horizontal-jittering">Profiling the horizontal jittering<a class="anchor-link" href="#Profiling-the-horizontal-jittering">&#182;</a></h3><p>Using phase correlation on image pairs that are $180^\text{o}$ away along $\omega$-axis, the</p>
+<h3 id="Profiling-the-horizontal-jittering">Profiling the horizontal jittering<a class="anchor-link" href="#Profiling-the-horizontal-jittering">&#182;</a></h3><p>Using phase correlation on image pairs that are $180^\text{o}$ away along $\omega$-axis, individual rotation centers $y_{rc}^\omega$ can be located for all images, the distribution of which can be used to evaluate the horizontal misalignment for the projections.</p>
 
 </div>
 </div>
@@ -12304,6 +12308,102 @@ To this end, two different method are proposed here:</p>
             width="850"
             height="500"
             src="imgs/rotcnt_stats.pdf"
+            frameborder="0"
+            allowfullscreen
+        ></iframe>
+        
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The distribution above shows that the raw data (uncorrected) has a really large variance in the rotation center (~20 pixels).
+The proposed IGA method can bring the average rotation center (mean of $y_{rc}^\omega$) down to the image column center (250).
+However, this has little effect of the variance of $y_{rc}^\omega$.
+Therefore the rotations centers in the projections remain scattered, but around a different/new average value.</p>
+<p>On the other hand, the IPA method can bring almost all the rotation centers to 250, except for six $\omega$s (3 pairs).
+Further investigation reveals that these three <em>uncorrectable</em> pairs contains at least one corrupted image where the sample is nowhere to be found within the image, which explains why phase correlation returns unrealistically large values back. 
+Since the foundation of phase correlation is the $180^\text{o}$ pairing, a total number of six image ($\omega$s) need to be exculded from the reconstruction process.
+In other words, the IPA method also can serve as an image corruption detector as its response to corrupted images is drastically different from the proper images.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s1">&#39;docs/demoIGA.html&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[9]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+        <iframe
+            width="550"
+            height="500"
+            src="docs/demoIGA.html"
+            frameborder="0"
+            allowfullscreen
+        ></iframe>
+        
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s1">&#39;docs/demoIPA.html&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[10]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+        <iframe
+            width="550"
+            height="500"
+            src="docs/demoIPA.html"
             frameborder="0"
             allowfullscreen
         ></iframe>
