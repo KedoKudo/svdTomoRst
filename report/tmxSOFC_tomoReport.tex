@@ -1,7 +1,9 @@
 \documentclass[12pt]{scrartcl}
+\usepackage{authblk}
 \usepackage{amsmath}
 \usepackage{FiraSans}
 \usepackage{siunitx}
+\usepackage{natbib}
 \usepackage{hyperref}
 \usepackage[capitalise]{cleveref}
 \usepackage{graphicx}
@@ -14,51 +16,164 @@
 
 \begin{document}
 
-\title{Tomography reconstruction of }
-\author{Chen Zhang}
+\title{
+Tomography characterization of solid oxide fuel cells using high-energy transmission x-ray microscopy}
+\author[a]{Chen Zhang}
+\author[b]{P. Kenesei}
+\author[b]{S. D. Shastri}
+\author[a]{R. M. Suter}
+
+\affil[a]{Department of Physics, Carnegie Mellon University, Pittsburgh, PA, USA}
+\affil[b]{Advanced Photon Source, Argonne National Laboratory, Argonne, IL, USA}
 
 \maketitle
 
-% ---- Background -----
-\section{Background}\label{sec: bg}
+% ----- Motivation ----- %
+\section{Motivation}\label{sec: motivation}
 
+High-energy transmission x-ray microscopy (HETXM) can provide tomography characterization with sub-micron spatial resolution for samples that are too thick for conventional nano-CT characterization \citep{Shastri_etal2015}.
+In this study, the tip region ($20\times20\times\SI{100}{\micro\meter}$) of a solid oxide fuel cell (SOFC) was characterized using HETXM.
+The sinograms collected from the HETXM experiment were used to reconstruct the morphology of the tip using open source tomography reconstruction suite TomoPy \citep{Gursoy_etal2014}, the results of which were used to evaluate the porosity state of the tip of the SOFC. 
+
+
+% ----- Experiment ----- %
 \section{Experiment}\label{sec: exp}
 
+The HETXM experiment was performed at the advanced photon source beamline 1-ID in the Argonne national laboratory using the standard HETXM configuration developed by \citet{Shastri_etal2015}.
+A total number of six tomography scans were conducted at \SI{\sim 50}{keV} using a far-field detector ($2048\times2048$ pixel resolution) with a step size of \ang{0.1}, resulting in an effective detection resolution of $\SI{200}{nm/pixel}$.
+Although all six tomography scans covering different regions of the SOFC pillar yielded projection images suitable for tomography reconstruction, only the tip of the SOFC was reconstructed and analyzed in this study, mostly as a proof of concept.
+
+
+% ----- Tomo recon ----- %
 \section{Tomography reconstruction}\label{sec: tomo}
 
 \subsection{Data preprocessing}\label{sec: preprocessing}
 
-\subsubsection{Background normalization}\label{sec: bg norm}
+The reflective lenses and the associated sub-micron resolution of HETXM makes the collected projection images more sensitive to the beam instability (beam wiggling and intensity fluctuation) and dynamic misalignment \footnote{
+The far-field detector can tilt and drift slightly with respect to the beam axis during the experiment, and the associated artifacts can be amplified by the HETXM configuration.
+} 
+when compared with conventional high-energy tomography characterization.
+Therefore, projection images collected from HETXM need to be corrected for both factors prior to tomography reconstruction.
+
+\subsubsection{
+Correction for beam instability
+}\label{sec: bg norm}
+
+Similar to conventional tomography characterization, the projection images collected from HETXM contains beam characteristics, which can be in theory removed by subtracting the flat field images (\cref{fig: flat field images}) following Beer's law. 
+However, the beam wiggling (spatial instability) and beam intensity fluctuation (temporal instability) can leave residual beam characteristics in the normalized projection images.
+Consequently, advanced background normalization is necessary to further minimize these residual beam characteristics.
 
 % --- background images --- %
-\renewcommand{\myscale}{0.8}
-\begin{figure}
+\renewcommand{\myscale}{0.4}
+\begin{figure}[htp]
 \centering
-\begin{tabular}{cc}
+\small
+\begin{tabular}{cccc}
 	 White field (before)
+&  White field (after)
 &  White field difference
+&  Dark field (after)
 \\
-  \includegraphics[scale=\myscale]{whiteField_pre} 
-& \includegraphics[scale=\myscale]{whiteField_diff}
-\\
-	Dark field (after)
-& White field (after)
-\\
-	\includegraphics[scale=\myscale]{darkField_pst}
+  \includegraphics[scale=\myscale]{whiteField_pre}
 & \includegraphics[scale=\myscale]{whiteField_pst}
+& \includegraphics[scale=\myscale]{whiteField_diff}
+& \includegraphics[scale=\myscale]{darkField_pst}
 \end{tabular}
 \caption{
 The median of background (white and dark) images collected before and after the tomography scan.
 The dynamic range of the white field images are $[0,4000]$ (counts) while the dynamic range of the dark field image is $[0,10]$ (counts).
-}
+}\label{fig: flat field images}
+\end{figure}
+
+Prior to the advanced background normalization, the analysis window is reduced from the detector size ($2048\times2048$) to the sample region ($500\times400$) such that the reduced image stack (\SI{\sim7}{GB}) can fit in a modern computer with double precision (64bit float).
+Given that impulse noise is a common issue in high-energy tomography characterization, selective median filter
+\footnote{
+The selective median filter replace the outliers (impulse noises) with the median value calculated within a given kernel.
+} 
+was applied to each individual sinogram to reduce the impulse noises (\cref{fig: noise reduction}).
+
+% --- noise reduction
+\renewcommand{\myscale}{1}
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=\myscale]{sinogramDenoise_retouched}
+\caption{
+Remove impulse noise from one example sinogram using selective median filter with a $3\times3$ kernel.
+}\label{fig: noise reduction}
+\end{figure}
+
+For a normalized sinogram from an ideal tomography characterization, the dark region of the sinogram ($<1$) denotes the sample attenuation strength whereas the rest (air) should be white ($=1$).
+However, the residual beam characteristics due to beam wiggling and intensity fluctuation often leaves horizontal linear features observed in \cref{fig: noise reduction}, which can be removed by rescaling each row of the sinogram such that the air region remains one (zero attenuation).
+In this study, this process is automated with the following algorithm
+%
+\begin{itemize}
+\item Calculate the cumulative intensity profile of each sinogram $i$ using $I_i = \sum_\omega I^\omega_i$.
+\item Use the second order derivative of $I_i$ to locate the left and right air stripes for each sinogram $i$.
+\item For each sinogram $i$, calculate the average intensity for each row in the left and right air stripes.
+\item For each sinogram $i$, rescale the intensity of each row such that the average intensity in the left and right air stripes are one.
+\item Calculate the total intensity difference $\Delta I$ due to the advanced normalization.
+\item Repeat previous steps until $\Delta I$ falls below certain tolerance.
+\end{itemize}
+
+In this study, it was found that a total number of ten iterations
+\footnote{
+One might also argue that one iteration is sufficient as $\Delta I$ decays rapidly as shown in the left most figures of \cref{fig: sino norm top,fig: sino norm mid,fig: sino norm bot}
+} of the advanced background normalization can successfully remove the horizontal linear artifacts in each sinogram, regardless of the signal to noise ratios (\cref{fig: sino norm top,fig: sino norm mid,fig: sino norm bot}).
+Furthermore, it was found that that beam has minimum wiggling during this HETXM experiment as no obvious gradient can be found in each row of the difference sinogram (the right most sinograms in \cref{fig: sino norm top,fig: sino norm mid,fig: sino norm bot}).
+
+% --- bg lvl norm
+\renewcommand{\myscale}{0.5}
+\begin{figure}
+\centering
+\includegraphics[scale=\myscale]{sinogramNormalization_top}
+\caption{
+Demonstration of the advanced background normalization in the top region of the projections with relatively \textbf{low} signal to noise ratio.
+}\label{fig: sino norm top}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=\myscale]{sinogramNormalization_middle}
+\caption{
+Demonstration of the advanced background normalization in the middle region of the sample with relatively \textbf{high} signal to noise ratio.
+}\label{fig: sino norm mid}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=\myscale]{sinogramNormalization_bottom}
+\caption{
+Demonstration of the advanced background normalization in the bottom region of the projections with \textbf{no} sample signals.
+}\label{fig: sino norm bot}
 \end{figure}
 
 
-\subsubsection{Data correction}\label{sec: data correction}
+\subsubsection{
+Correction for dynamic misalignment
+}\label{sec: correct dynamic misalignment}
+
+In an ideal tomography characterization setting, a single rotation axis is shared by all \ang{180}-pair of projections due to the nature of the experiment.
+However, dynamic misalignment could occur during the experiment due to the shifting/drifting/vibration of both the detector and sample stage.
+For conventional high-energy tomography characterization, this effect is often well-below the experiment resolution, rendering its negative impact negligible.
+This unfortunately does not hold true for HETXM due to its innate high spatial resolution, which often results in the appeared sample jittering in the collected projections.
+
+Using the center column of the projection image as a reference, one could correct the horizontal component of the dynamic misalignment by systematically shifting the rotation axis of \ang{180}-pair projections to the reference rotation axis.
+In this study, this process was realized as the following steps:
+%
+\begin{itemize}
+\item 
+Calculate the pair-wise rotation center (horizontal component of the rotation axis) of each \ang{180}-pair using a sub-pixel image registration algorithm developed by \citet{Guizar-Sicairos_etal2008}.
+\item 
+Calculate the difference ($\delta_h$) between the pair-wise rotation center and the horizontal center of the projection image (\cref{fig: corrupted frame detection}).
+\item 
+Inspect the pairs with extremely large deviation (outliers), and remove the pairs contain corrupted frames (\cref{fig: corrupted frames}).
+\item
+Shift each \ang{180}-pair of projections such that all projection images share the same rotation axis (the reference rotation axis).
+\end{itemize}
 
 % --- corrupted frame detection
 \renewcommand{\myscale}{1}
-\begin{figure}
+\begin{figure}[htp]
 \centering
 \includegraphics[scale=\myscale]{corruptedFrameDetection}
 \caption{
@@ -68,61 +183,26 @@ The corrupted frames can be detected by checking the outliers in the profile of 
 
 % --- detected corrupted frames
 \renewcommand{\myscale}{0.5}
-\begin{figure}
+\begin{figure}[htp]
 \centering
 \includegraphics[scale=\myscale]{corruptedFrames}
 \caption{
 Three corrupted frames were detected out of the total 3600 frames.
-Due to the horizontal detector jittering, these corrupted frames and the associated \ang{180} pairs were excluded from the tomography reconstruction as it is not possible to adjust a \ang{180} pair horizontally with one corrupted frame.
+These corrupted frames and the associated \ang{180} pairs were excluded from the tomography reconstruction as it is not possible to adjust a \ang{180} pair horizontally with one corrupted frame.
 }\label{fig: corrupted frames}
 \end{figure}
 
-\subsubsection{Data reduction}\label{sec: data reduction}
+In theory, one should also correct for the \textbf{vertical} component of the dynamic misalignment.
+However, this was deemed impossible with current HETXM configuration due to \textit{the lack of a common reference point}.
+Therefore, the vertical component of the dynamic misalignment was left uncorrected in this study.
 
-\subsubsection{Background normalization}\label{sec: bg norm}
 
-\subsubsection{Impulse noise reduction}\label{sec: noise reduction}
-
-% --- noise reduction
-\renewcommand{\myscale}{1}
-\begin{figure}
-\centering
-\includegraphics[scale=\myscale]{sinogramDenoise_retouched}
-\caption{
-Remove impulse noise from sinogram using selective median filter.
-}\label{fig: noise reduction}
-\end{figure}
-
-\subsubsection{Bcakground level normalization}\label{sec: bg lv norm}
-
-% --- bg lvl norm
-\renewcommand{\myscale}{0.5}
-\begin{figure}
-\centering
-\includegraphics[scale=\myscale]{sinogramNormalization_top}
-\caption{
-Top region
-}\label{fig: sino norm top}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[scale=\myscale]{sinogramNormalization_middle}
-\caption{
-Middle region
-}\label{fig: sino norm mid}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[scale=\myscale]{sinogramNormalization_bottom}
-\caption{
-Bottom region
-}\label{fig: sino norm bot}
-\end{figure}
+\subsection{Tomography reconstruction}\label{sec: tomo recon}
 
 % --- intensity distribution along stack
 
+
+% ----- Void characterization ----- %
 \section{Porosity characterization}\label{sec: porosity characterization}
 
 % --- void detection demo
@@ -145,6 +225,13 @@ void profile
 }\label{fig: void profile}
 \end{figure}
 
+
+% ----- summary ----- %
 \section{Summary}\label{sec: summary}
+
+
+% ----- reference ----- %
+\bibliographystyle{plainnat}
+\bibliography{tmxSOFC_tomoReport}
 
 \end{document}
