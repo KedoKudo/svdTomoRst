@@ -1,0 +1,4 @@
+background:
+    white field range: [0, 4000]
+    white field diff range: [-200, 200]
+    dark field range: [0, 10]
