@@ -4,7 +4,16 @@
 \usepackage{FiraSans}
 \usepackage{siunitx}
 \usepackage{natbib}
-\usepackage{hyperref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[pdftex,
+bookmarksnumbered=true,
+colorlinks=true,
+linkcolor=Blue,
+citecolor=Gray,
+urlcolor=ForestGreen,
+pdfpagelabels=false,
+plainpages = false,
+]{hyperref}
 \usepackage[capitalise]{cleveref}
 \usepackage{graphicx}
 \graphicspath{
@@ -199,14 +208,55 @@ Therefore, the vertical component of the dynamic misalignment was left uncorrect
 
 \subsection{Tomography reconstruction}\label{sec: tomo recon}
 
-% --- intensity distribution along stack
+Prior to the actual tomography reconstruction,  a per slab based rotation axis deviation analysis was perform for the HETXM data set since a tilted rotation axis is a common problem in standard tomography characterization.
+More specifically, four \ang{180}-pair of projections were randomly selected from the tomography projection image stacks.
+Each pair is then vertically divided into 200 slabs with thickness of two pixels.
+The same image registration based method was used to calculate the rotation axis for each slab in each pair.
+These per slab based rotation axis centers were then used to calculate the relative deviation ($\delta_h$) with respect to the common reference rotation axis.
+The general trend of the profile in \cref{fig: rotation axis tilt profile} ($\delta_h$ going from positive to negative when moving from top slabs to lower slabs) indicate that the rotation axis of this HETXM data set is indeed tilted.
+Therefore, a per slab based tomography reconstruction was performed using the ``gridrec'' engine and ``hann'' filter from TomoPy \citep{Gursoy_etal2014}.
+The resulting reconstruction results can be found in \cref{fig: recon demo}. 
+
+% --- rotation axis tilt
+\renewcommand{\myscale}{1.0}
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=\myscale]{rotationAxisTiltDemo_retouched}
+\caption{
+The per slab (2 pixels) based rotation axis deviation profile of four \ang{180}-pair projections indicates that the rotation axis of the collected tomography projection image stack is tilted, which results in the consistent trend going from positive (top) to negative (bottom).
+}\label{fig: rotation axis tilt profile}
+\end{figure}
+
+% --- reconstruction results
+\renewcommand{\myscale}{0.3}
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=\myscale]{recon_demo}
+\caption{
+Orthogonal slices of the tomography reconstruction results show evident porous characteristics of the tip of the SOFC. 
+}\label{fig: recon demo}
+\end{figure}
 
 
 % ----- Void characterization ----- %
 \section{Porosity characterization}\label{sec: porosity characterization}
 
+The tomography reconstruction results (\cref{fig: recon demo}) demonstrate evident porous characteristics of the tip of the SOFC.
+In this section, the 2D porosity of the tip of SOFC is systematically characterized using phase retrieval in conjunction with \href{https://en.wikipedia.org/wiki/Blob_detection}{Laplacian of Gaussian (LOG)} based blob detection.
+
+% --- phase retrieve demonstration
+\renewcommand{\myscale}{0.42}
+\begin{figure}
+\centering
+\includegraphics[scale=\myscale]{phaseRetrievalDemo}
+\caption{
+phase retrieval demo
+}\label{fig: phase retrieval demo}
+\end{figure}
+
+
 % --- void detection demo
-\renewcommand{\myscale}{1.0}
+\renewcommand{\myscale}{.5}
 \begin{figure}
 \centering
 \includegraphics[scale=\myscale]{voidDetectionDemo_mid}
