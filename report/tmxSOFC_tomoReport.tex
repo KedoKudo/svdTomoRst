@@ -244,16 +244,22 @@ Orthogonal slices of the tomography reconstruction results show evident porous c
 The tomography reconstruction results (\cref{fig: recon demo}) demonstrate evident porous characteristics of the tip of the SOFC.
 In this section, the 2D porosity of the tip of SOFC is systematically characterized using phase retrieval in conjunction with \href{https://en.wikipedia.org/wiki/Blob_detection}{Laplacian of Gaussian (LOG)} based blob detection.
 
+Despite the advanced background normalization performed in \cref{sec: bg norm}, there are still many relatively weak linear artifacts surrounding the reconstructed volume.
+These linear features are commonly referred to as phase contrast artifacts, which can interfere with LOG based blob detection.
+Therefore, a single image based phase retrieval method developed by \citet{Paganin_etal2002} was used to extract absorption and phase contrast maps from reconstruction results (\cref{fig: phase retrieval demo}).
+The absorption maps provide a generate guide to locate the sample when used in conjunction with a circular mask that isolate the sample neighborhood.
+Furthermore, it can also serve as a mask to suppress the unwanted linear phase contrast artifacts in the phase contrast map, resulting in a composite image that are more suitable for LOG-based blob detection.
+An example of this 2D void characterization process is demonstrated in \cref{fig: void detection demo}.
+
 % --- phase retrieve demonstration
 \renewcommand{\myscale}{0.42}
-\begin{figure}
+\begin{figure}[htp]
 \centering
 \includegraphics[scale=\myscale]{phaseRetrievalDemo}
 \caption{
-phase retrieval demo
+The absorption contrast (left) and the phase contrast (middle) are separated from the reconstruction results (right) using the method originally developed by \citet{Paganin_etal2002}.
 }\label{fig: phase retrieval demo}
 \end{figure}
-
 
 % --- void detection demo
 \renewcommand{\myscale}{.5}
@@ -261,17 +267,25 @@ phase retrieval demo
 \centering
 \includegraphics[scale=\myscale]{voidDetectionDemo_mid}
 \caption{
-void detection demo
+LOG-based blob detection was used to identify the void features (highlighted with \textcolor{red}{O}) in a 2D slice of the reconstruction results.
+The cumulative distribution function of the 2D void radius ($R_\text{void}$) is super imposed at the upper right corner of the image.
+A circular mask is used to isolate the sample, which improves the efficiency of the porosity characterization by limiting the analysis scope to the sample neighborhood only.
 }\label{fig: void detection demo}
 \end{figure}
 
+The 2D void characterization process was performed for all 400 slices of the reconstruction results, the results of which are shown as a 2D histogram of the 2D void counts with respect to the slice position and void size (\cref{fig: void profile}).
+According to this 2D histogram, the majority of the voids are present near the base of the tip, mostly with a radius of \SI{1}{\micro\meter}.
+As moving towards the middle section of the tip, some large voids (\SI{15}{\micro\meter}) started to appear, while the total number of voids continue to decline.
+While moving from the middle section to the tip at the bottom, the number of both large and small voids decreases rapidly, leading to about 1 void per \SI{0.4}{\square\micro\meter} near the very end.
+ 
 % --- porosity profile
 \renewcommand{\myscale}{1.0}
-\begin{figure}
+\begin{figure}[htp]
 \centering
 \includegraphics[scale=\myscale]{void_profile}
 \caption{
-void profile
+The 2D histogram of the 2D void counts with respect to the slice position and the void radius (2D), along with the associated 1D distribution along the axis of slice position (right) and void size (top). 
+The count in each bin is plotted on a log color scale.
 }\label{fig: void profile}
 \end{figure}
 
@@ -279,6 +293,8 @@ void profile
 % ----- summary ----- %
 \section{Summary}\label{sec: summary}
 
+In this study, the porous structure of the tip of a SOFC cathode is characterized using HETXM.
+After correction for beam instability and dynamic misalignment, the associated 
 
 % ----- reference ----- %
 \bibliographystyle{plainnat}
