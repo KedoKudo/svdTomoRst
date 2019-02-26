@@ -41,16 +41,16 @@ Tomography characterization of solid oxide fuel cells using high-energy transmis
 \section{Motivation}\label{sec: motivation}
 
 High-energy transmission x-ray microscopy (HETXM) can provide tomography characterization with sub-micron spatial resolution for samples that are too thick for conventional nano-CT characterization \citep{Shastri_etal2015}.
-In this study, the tip region ($20\times20\times\SI{100}{\micro\meter}$) of a solid oxide fuel cell (SOFC) was characterized using HETXM.
-The sinograms collected from the HETXM experiment were used to reconstruct the morphology of the tip using open source tomography reconstruction suite TomoPy \citep{Gursoy_etal2014}, the results of which were used to evaluate the porosity state of the tip of the SOFC. 
+In this study, the tip region ($20\times20\times\SI{100}{\micro\meter}$) of the cathode of a solid oxide fuel cell (SOFC) was characterized using HETXM.
+The sinograms collected from the HETXM experiment were used to reconstruct the morphology of the cathode using open source tomography reconstruction suite TomoPy \citep{Gursoy_etal2014}, the results of which were used to evaluate the porosity state of the cathode of the SOFC. 
 
 
 % ----- Experiment ----- %
 \section{Experiment}\label{sec: exp}
 
 The HETXM experiment was performed at the advanced photon source beamline 1-ID in the Argonne national laboratory using the standard HETXM configuration developed by \citet{Shastri_etal2015}.
-A total number of six tomography scans were conducted at \SI{\sim 50}{keV} using a far-field detector ($2048\times2048$ pixel resolution) with a step size of \ang{0.1}, resulting in an effective detection resolution of $\SI{200}{nm/pixel}$.
-Although all six tomography scans covering different regions of the SOFC pillar yielded projection images suitable for tomography reconstruction, only the tip of the SOFC was reconstructed and analyzed in this study, mostly as a proof of concept.
+A total number of six tomography scans were conducted to characterize both the anode and cathode of the SOFC sample at \SI{\sim 50}{keV} using a far-field detector ($2048\times2048$ pixel resolution) with a step size of \ang{0.1}, resulting in an effective detection resolution of $\SI{200}{nm/pixel}$.
+Although all six tomography scans covering different regions of the SOFC pillar yielded projection images suitable for tomography reconstruction, only the top region (cathode) of the SOFC was reconstructed and analyzed in this study, mostly as a proof of concept.
 
 
 % ----- Tomo recon ----- %
@@ -58,7 +58,8 @@ Although all six tomography scans covering different regions of the SOFC pillar 
 
 \subsection{Data preprocessing}\label{sec: preprocessing}
 
-The reflective lenses and the associated sub-micron resolution of HETXM makes the collected projection images more sensitive to the beam instability (beam wiggling and intensity fluctuation) and dynamic misalignment \footnote{
+The reflective lenses and the associated sub-micron resolution of HETXM makes the collected projection images more sensitive to the beam instability (beam wiggling and intensity fluctuation) and dynamic misalignment%
+\footnote{
 The far-field detector can tilt and drift slightly with respect to the beam axis during the experiment, and the associated artifacts can be amplified by the HETXM configuration.
 } 
 when compared with conventional high-energy tomography characterization.
@@ -68,7 +69,7 @@ Therefore, projection images collected from HETXM need to be corrected for both 
 Correction for beam instability
 }\label{sec: bg norm}
 
-Similar to conventional tomography characterization, the projection images collected from HETXM contains beam characteristics, which can be in theory removed by subtracting the flat field images (\cref{fig: flat field images}) following Beer's law. 
+Similar to conventional tomography characterization, the projection images collected from HETXM contains beam characteristics, which can be in theory removed by subtracting the flat field images (\cref{fig: flat field images}) following the Beer's law. 
 However, the beam wiggling (spatial instability) and beam intensity fluctuation (temporal instability) can leave residual beam characteristics in the normalized projection images.
 Consequently, advanced background normalization is necessary to further minimize these residual beam characteristics.
 
@@ -95,7 +96,7 @@ The dynamic range of the white field images are $[0,4000]$ (counts) while the dy
 \end{figure}
 
 Prior to the advanced background normalization, the analysis window is reduced from the detector size ($2048\times2048$) to the sample region ($500\times400$) such that the reduced image stack (\SI{\sim7}{GB}) can fit in a modern computer with double precision (64bit float).
-Given that impulse noise is a common issue in high-energy tomography characterization, selective median filter
+Given that impulse noise is a common issue in high-energy tomography characterization, selective median filter%
 \footnote{
 The selective median filter replace the outliers (impulse noises) with the median value calculated within a given kernel.
 } 
@@ -111,8 +112,8 @@ Remove impulse noise from one example sinogram using selective median filter wit
 }\label{fig: noise reduction}
 \end{figure}
 
-For a normalized sinogram from an ideal tomography characterization, the dark region of the sinogram ($<1$) denotes the sample attenuation strength whereas the rest (air) should be white ($=1$).
-However, the residual beam characteristics due to beam wiggling and intensity fluctuation often leaves horizontal linear features observed in \cref{fig: noise reduction}, which can be removed by rescaling each row of the sinogram such that the air region remains one (zero attenuation).
+For a normalized sinogram from an ideal tomography characterization, the dark region of the sinogram ($<1$) denotes the sample attenuation strength whereas the rest (air) should be uniformly white ($=1$).
+However, the residual beam characteristics due to beam wiggling and intensity fluctuation often leaves horizontal linear artifacts observed in \cref{fig: noise reduction}, which can be removed by rescaling each row of the sinogram such that the air region remains one (zero attenuation).
 In this study, this process is automated with the following algorithm
 %
 \begin{itemize}
@@ -124,7 +125,7 @@ In this study, this process is automated with the following algorithm
 \item Repeat previous steps until $\Delta I$ falls below certain tolerance.
 \end{itemize}
 
-In this study, it was found that a total number of ten iterations
+In this study, it was found that a total number of ten iterations%
 \footnote{
 One might also argue that one iteration is sufficient as $\Delta I$ decays rapidly as shown in the left most figures of \cref{fig: sino norm top,fig: sino norm mid,fig: sino norm bot}
 } of the advanced background normalization can successfully remove the horizontal linear artifacts in each sinogram, regardless of the signal to noise ratios (\cref{fig: sino norm top,fig: sino norm mid,fig: sino norm bot}).
@@ -208,7 +209,7 @@ Therefore, the vertical component of the dynamic misalignment was left uncorrect
 
 \subsection{Tomography reconstruction}\label{sec: tomo recon}
 
-Prior to the actual tomography reconstruction,  a per slab based rotation axis deviation analysis was perform for the HETXM data set since a tilted rotation axis is a common problem in standard tomography characterization.
+Prior to the actual tomography reconstruction,  a per slab based rotation axis deviation analysis was perform for the HETXM data set since a tilted rotation axis is a common problem in the standard tomography characterization.
 More specifically, four \ang{180}-pair of projections were randomly selected from the tomography projection image stacks.
 Each pair is then vertically divided into 200 slabs with thickness of two pixels.
 The same image registration based method was used to calculate the rotation axis for each slab in each pair.
@@ -274,9 +275,12 @@ A circular mask is used to isolate the sample, which improves the efficiency of 
 \end{figure}
 
 The 2D void characterization process was performed for all 400 slices of the reconstruction results, the results of which are shown as a 2D histogram of the 2D void counts with respect to the slice position and void size (\cref{fig: void profile}).
-According to this 2D histogram, the majority of the voids are present near the base of the tip, mostly with a radius of \SI{1}{\micro\meter}.
-As moving towards the middle section of the tip, some large voids (\SI{15}{\micro\meter}) started to appear, while the total number of voids continue to decline.
-While moving from the middle section to the tip at the bottom, the number of both large and small voids decreases rapidly, leading to about 1 void per \SI{0.4}{\square\micro\meter} near the very end.
+According to this 2D histogram, the majority of the voids are present near the base of the cathode, mostly with a radius of \SI{1}{\micro\meter}.
+As moving towards the middle section, some large voids (\SI{15}{\micro\meter}) started to appear, while the total number of voids continue to decline.
+While moving from the middle section to the tip at the bottom, the number of both large and small voids decreases rapidly, leading to about 1 void per \SI{0.4}{\square\micro\meter} near the very end%
+\footnote{
+Some of these detected voids near the very tip of the cathode are actually false-positive due to the aggressive settings used in the LOG-based blob detection.
+}.
  
 % --- porosity profile
 \renewcommand{\myscale}{1.0}
@@ -295,7 +299,7 @@ The count in each bin is plotted on a log color scale.
 
 In this study, the porous structure of the tip of a SOFC cathode is characterized using HETXM.
 After correction for beam instability and dynamic misalignment, the sub-micron features (voids) were successfully captured through the tomography reconstruction.
-Using phase retrieval in conjunction with LOG-based blob detection, the porosity of this SOFC cathode was characterized, demonstrating that HETXM can serve as a new technique to characterize sub-micron features non-destructively with high-penetration depth. 
+Using phase retrieval in conjunction with LOG-based blob detection, the porosity of this SOFC cathode was characterized, demonstrating that HETXM can serve as a reliable technique to characterize sub-micron features non-destructively with high-penetration depth. 
 
 % ----- reference ----- %
 \bibliographystyle{plainnat}
